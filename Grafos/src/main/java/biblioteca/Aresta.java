@@ -16,4 +16,4 @@ public class Aresta {
     public Vertice get_destino() {
         return this.destino;
     }
-
+}

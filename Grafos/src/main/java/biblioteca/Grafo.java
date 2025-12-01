@@ -75,7 +75,7 @@ public class Grafo<T> {
             Vertice proximo;
             for(int i=0; i<destinos.size();i++){
                 proximo=destinos.get(i).get_destino();
-                if(!marcados.contains(proximo)&&fila.contains(proximo)){
+                if(!marcados.contains(proximo)&&!fila.contains(proximo)){
                     fila.add(proximo);
                 }
             }
