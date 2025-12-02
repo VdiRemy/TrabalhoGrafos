@@ -47,11 +47,15 @@ public class Vertice<T> implements Comparable<Vertice<T>>{
         this.pai = null; //para reconstruir o caminho (de onde eu vim)
         this.visitado = false; //para evitar repetição  
         }
-
+    
+    //ensina o java a ordenar os vertices. usado pela fila de prioridade (ou sort) 
+    //para colocar sempre quem tem a menor distancia_minima primeiro
     @Override
     public int compareTo(Vertice<T> outro) {
         return Float.compare(this.distancia_minima, outro.distancia_minima);
     }
+    //faz o print mostrar o nome da cidade (valor) em vez do codigo de memoria 
+    //quando mandamos imprimir o objeto ou a lista
     @Override
     public String toString() { return valor.toString(); }
 }
