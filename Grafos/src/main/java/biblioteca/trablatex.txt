@@ -1,0 +1,834 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- Configurações de Layout e Fonte (Obrigatório) ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+%\usepackage{fontspec} % Para compilação em LuaLaTeX
+
+% --- Configuração de Idioma e Suporte a Unicode (Moderno) ---
+% Removemos pacotes conflitantes como inputenc e fontenc.
+\usepackage[brazil]{babel}
+\babelprovide[import, onchar=ids fonts]{english} % Garante suporte a comandos em inglês (como \url)
+
+% Set default/Latin font to Noto Sans (Mandatório)
+
+
+% --- Pacotes e Estilos do Usuário ---
+\usepackage{float}
+\usepackage{tikz}
+\usepackage{framed}
+\usepackage[most]{tcolorbox}
+\usetikzlibrary{arrows.meta, positioning}
+\usepackage[table]{xcolor}
+\definecolor{arraycolor}{RGB}{220, 235, 247}
+\definecolor{linkedcolor}{RGB}{255, 220, 220}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% Estilo para código Java
+\lstdefinestyle{javastyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    language=Java
+}
+
+% Estilo inline para código no texto
+\newcommand{\code}[1]{\texttt{\color{blue}#1}}
+\newcommand{\class}[1]{\texttt{\color{teal}#1}}
+\newcommand{\method}[1]{\texttt{\color{purple}#1}}
+\newcommand{\keyword}[1]{\texttt{\color{magenta}#1}}
+\newcommand{\interface}[1]{\texttt{\color{orange}#1}}
+\newcommand{\bigO}{\mathcal{O}}
+
+\lstset{style=javastyle}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CORPO DO DOCUMENTO
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+% --- CAPA ---
+\begin{titlepage}
+    \centering
+    
+    {\large IFES Campus Serra\par}
+    \vspace{1cm}
+    {\large Bacharelado em Sistemas de Informação\par}
+    \vspace{1.5cm}
+    {\Large\bfseries Técnicas de Programação Avançada\par}
+    
+    \vfill
+    
+    {\huge\bfseries Implementação e Análise de Complexidade de Árvores AVL e Bibliotecas Padrão Java\par}
+    
+    \vfill
+    
+    \begin{flushright}
+        \Large
+        Remerson Victor S. da Assurreição \\
+    \end{flushright}
+    
+    \vfill
+    
+    {\large Serra, \today\par}
+
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ------------------------------------------------------------------------------
+\section{Análise da Árvore AVL}
+
+Nesta etapa, analisamos os benefícios da \class{ArvoreAVL}, uma árvore binária de busca que é capaz de se balancear. Esta análise é baseada nos resultados da execução do \class{AppRelatorioAVL} na etapa 4 .
+
+O algoritmo compara a altura de uma \class{ArvoreBinaria} (ABB) padrão com uma \class{ArvoreAVL} ao receberem a mesma entrada degenerada (inserção em ordem crescente), conforme o \class{AppRelatorioAVL.java}.
+
+\begin{table}[h!]
+\centering
+\caption{Resultados obtidos: Altura da Árvore (Entrada Degenerada)}
+\label{tab:avl}
+\begin{tabular}{@{}r|c|c@{}}
+\toprule
+\textbf{Nº de Elementos} & \textbf{Altura ABB (Degenerada)} & \textbf{Altura AVL} \\ \midrule
+100 & 99 & 6 \\
+1.000 & 999 & 9 \\
+10.000 & 9.999 & 13 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\subsection{Q1. Comparação de Alturas (ABB vs. AVL
+
+
+}
+Conforme a Tabela \ref{tab:avl}, a altura da \class{ArvoreAVL} é drasticamente menor que a da \class{ArvoreBinaria} padrão, mesmo ambas recebendo a mesma entrada degenerada (\method{geraArvoreDegenerada}).
+
+\vspace{0.5em}
+
+\noindent \textbf{Explicação:} A \class{ArvoreBinaria} padrão (ABB), implementada na Etapa 1, não possui mecanismos de balanceamento. Ao receber dados ordenados (como o \method{geraArvoreDegenerada} faz), ela insere todos os nós em uma única direção (à direita), resultando em uma topologia de lista encadeada com altura $h = N-1$, que como sabemos por conta de trabalhos anteriores, possui complexidade de $\bigO(N)$.
+
+\vspace{0.5em}
+
+A \class{ArvoreAVL}, por outro lado, sobrescreve o método \method{adicionar(T)} para verificar o Fator de Balanceamento (FB) de seus nós após cada inserção.
+
+\vspace{0.5em}
+
+\subsubsection{A inserção}
+O processo de inserção ocorre da seguinte forma:
+
+\vspace{0.5em}
+
+A AVL insere o novo nó da mesma forma que a ABB faz (encontrano um local que ainda não foi preenchido, um ponteiro nulo).
+
+\vspace{0.5em}
+
+Após a inserção ocorre a parte crucial, onde o algoritmo retorna de forma recursiva até a raiz, onde em cada nó desse caminho de retorno, o algoritmo realiza alguma verificações e correções:
+
+\begin{enumerate}
+    \item Recalcula a altura daquele nó.
+    \item Recalcula o Fator de Balanceamento (FB) daquele nó.
+    \item Se o FB for $2$ ou $-2$, o algoritmo para e aplica imediatamente uma \textbf{rotação} naquele nó para consertar o desbalanceamento antes de continuar subindo.
+\end{enumerate}
+
+\noindent Isso faz com que a AVL não se degenere, evitando o problema da árvore que se comporta como uma lista, onde ela corrige o primeiro desbalanceamento que encontra no caminho de volta após a inserção.
+
+\subsubsection{O Fator de Balanceamento}
+
+O Fator de Balanceamento (FB) é uma métrica usada para monitorar a saúde da árvore, isto é, se continua balanceada, sendo que é calculado em cada nó da árvore. A fórmula é dada por:
+
+\begin{framed}
+\[
+FB = \text{Altura(Subárvore Direita)} - \text{Altura(Subárvore Esquerda)}
+\]
+\end{framed}
+
+A árvore é considerada saudável (balanceada) se o resultado (FB) de todos os nós estiver entre -1, 0 ou 1, tendo os seguintes significados: 
+\tcbset{
+  colback=gray!5,      % cor de fundo suave
+  colframe=gray!50,    % cor da borda
+  boxrule=0.3pt,       % espessura da borda
+  arc=2pt,             % cantos levemente arredondados
+  left=6pt, right=6pt, top=5pt, bottom=5pt
+}
+
+\begin{tcolorbox}[title={Fator de Balanceamento (FB)}]
+\[
+\begin{aligned}
+FB = 0  &:~ \text{O nó está perfeitamente balanceado (ambas as subárvores têm a mesma altura, } h_d - h_e = 0). \\[4pt]
+FB = 1  &:~ \text{A subárvore direita é 1 nível mais alta que a esquerda, } h_d - h_e = 1. \\[4pt]
+FB = -1 &:~ \text{A subárvore esquerda é 1 nível mais alta que a direita, } h_d - h_e = -1.
+\end{aligned}
+\]
+\end{tcolorbox}
+
+Quando o fator de balanceamento de um nó excede $|1|$, a AVL aplica \textbf{rotações (Simples ou Duplas)} para reorganizar os nós e forçar a árvore a manter uma altura logarítmica, $h \approx \log_2 N$.
+
+\subsubsection{As Rotações}
+As rotações são modificações que a AVL faz com o objetivo de redistribuir os nós, diminuindo a altura e consertando o FB. Elas são operações de troca de ponteiros muito rápidas, sendo tempo constante ($\bigO(1)$).
+
+\vspace{0.5em}
+
+\noindent Há quatro cenários onde ocorre o desbalanceamento, exigindo dois tipos de rotação
+
+\tcbset{
+  colback=gray!5,      % cor de fundo suave
+  colframe=gray!50,    % cor da borda
+  boxrule=0.3pt,       % espessura da borda
+  arc=2pt,             % cantos levemente arredondados
+  left=6pt, right=6pt, top=5pt, bottom=5pt
+}
+
+\begin{tcolorbox}[title={Rotações em Árvores AVL}]
+\textbf{A. Rotação Simples (Desbalanceamento "Linear")}
+
+Usada quando a árvore cresce “em linha reta” para fora.
+
+\begin{itemize}
+    \item \textbf{Caso 1: Direita–Direita (FB = 2)}  
+    O nó desbalanceado tem $FB = 2$, e seu filho direito tem $FB = 1$.
+    
+    \vspace{0.03em}
+    
+    \textbf{Correção:} aplica-se uma \textit{Rotação Simples à Esquerda} no nó desbalanceado. O pivô desce e seu filho direito sobe para ocupar seu lugar.
+
+    \item \textbf{Caso 2: Esquerda–Esquerda (FB = -2)}  
+    O nó desbalanceado tem $FB = -2$, e seu filho esquerdo tem $FB = -1$.  
+    \vspace{0.03em}
+    
+    \textbf{Correção:} aplica-se uma \textit{Rotação Simples à Direita} no nó desbalanceado.
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{B. Rotação Dupla (Desbalanceamento "Zigue–Zague")}
+
+Usada quando a árvore cresce “para dentro” antes de crescer para fora, formando um “joelho”.
+
+\begin{itemize}
+    \item \textbf{Caso 3: Direita–Esquerda (FB = 2)}  
+    O nó desbalanceado tem $FB = 2$, mas seu filho direito tem $FB = -1$.
+    
+    \vspace{0.03em}
+    
+    \textbf{Correção:} aplica-se uma \textit{Rotação Dupla Direita–Esquerda}:  
+    primeiro uma \textit{Rotação à Direita} no filho (para alinhar a estrutura),  
+    depois uma \textit{Rotação à Esquerda} no nó original (transformando o caso em Direita–Direita).
+
+    \item \textbf{Caso 4: Esquerda–Direita (FB = -2)}  
+    O nó desbalanceado tem $FB = -2$, mas seu filho esquerdo tem $FB = 1$. 
+    
+    \vspace{0.03em} 
+    
+    \textbf{Correção:} aplica-se uma \textit{Rotação Dupla Esquerda–Direita}:  
+    primeiro uma \textit{Rotação à Esquerda} no filho,  
+    depois uma \textit{Rotação à Direita} no nó original.
+\end{itemize}
+\end{tcolorbox}
+
+\vspace{0.5em}
+
+Ao aplicar essas quatro regras de correção após cada inserção, a \textbf{AVL} garante que a altura $h$ da árvore nunca se afaste muito do ideal matemático ($\log_2 N$), assegurando assim o desempenho $\bigO(\log N)$ para todas as operações.
+
+\vspace{0.5em}
+
+\noindent Portanto, a AVL, por definição, impede a degeneração da árvore, mantendo sua altura mínima, mesmo quando a entrada é o "pior caso" (ordenada).
+
+\subsection{Q2. Ordem de Complexidade da Busca em AVL}
+A ordem de complexidade de buscas em árvores AVL, mesmo as criadas com o método \method{geraArvoreDegenerada}, é \textbf{$\bigO(\log N)$ (Tempo Logarítmico)}.
+
+\vspace{0.5em}
+
+\noindent \textbf{Explicação:}
+
+O desempenho de uma operação de busca (\method{pesquisar(T valor)}) em qualquer Árvore Binária de Busca (seja ela balanceada ou não) é diretamente proporcional à sua altura (h). O algoritmo de busca funciona da seguinte maneira:
+\begin{itemize}
+\item Compara-se o valor buscado com o nó atual (iniciando pela raiz).
+
+\item Se o valor é menor, descarta-se toda a subárvore direita.
+
+\item Se o valor é maior, descarta-se toda a subárvore esquerda.
+
+\item O processo é repetido, descendo um nível na árvore a cada comparação.
+\end{itemize}
+
+\noindent Portanto, o número máximo de comparações necessárias (o pior caso) é igual à altura da árvore (h). A complexidade da busca é $\bigO(h)$. A diferença crucial entre a \class{ArvoreBinaria} (ABB) padrão e a \class{ArvoreAVL} reside em como cada uma gerencia o valor de h.
+
+\subsubsection{O Pior Caso da ABB Padrão (Revisão)} Como analisado na Etapa 3 (e referenciado na Q1 deste relatório), quando uma ABB padrão recebe uma entrada ordenada, ela não possui mecanismos para corrigir sua estrutura. 
+\begin{itemize}
+\item A árvore se degenera em uma estrutura linear (lista encadeada).
+\item A altura (h) cresce linearmente com o número de nós: h=N−1.
+\item A complexidade de busca $\bigO(h)$ torna-se $\bigO(N)$, anulando o propósito da árvore. 
+\end{itemize}
+
+\subsubsection{A Garantia da AVL} A \class{ArvoreAVL} foi projetada especificamente para resolver este problema do pior caso. Como detalhado extensivamente na seção anterior (Q1), a AVL sobrescreve o método \method{adicionar(T)} para monitorar o Fator de Balanceamento (FB) e aplicar rotações (Simples ou Duplas) \textit{durante} o processo de inserção.
+
+\begin{itemize} \item
+\begin{tcolorbox}[
+    colback=gray!5,
+    colframe=gray!50,
+    boxrule=0.3pt,
+    arc=2pt,
+    left=6pt, right=6pt, top=5pt, bottom=5pt,
+    title={Exemplo de Gatilho de Rotação (Caso Direita-Direita)}
+]
+
+% O seu texto de explicação
+\textit{Se o \method{geraArvoreDegenerada} tenta adicionar "101" à direita de "100", e depois "102" à direita de "101", o FB do nó "100" se tornaria 2.}
+
+\vspace{0.5cm}
+\begin{center}
+\begin{tikzpicture}[
+    % Estilo do nó normal (balanceado)
+    goodnode/.style={rectangle, draw, rounded corners=3pt, fill=arraycolor, minimum size=0.8cm, font=\bfseries\small},
+    % Estilo do nó desbalanceado (o gatilho)
+    badnode/.style={rectangle, draw, rounded corners=3pt, fill=linkedcolor, minimum size=0.8cm, font=\bfseries\small},
+    % Estilo para o Fator de Balanceamento (FB)
+    fb/.style={font=\footnotesize\ttfamily\color{black!70}, anchor=west, xshift=3mm}
+]
+
+% --- Definindo os nós e seus FBs ---
+% Nó (100) é a raiz do problema (FB=2)
+\node [badnode] (n100) at (0, 0) {100}
+    node [fb] (fb100) at (n100.east) {FB = 2};
+    
+% Nó (101) tem FB=1 (h_dir=0, h_esq=-1)
+\node [goodnode] (n101) [below right=0.8cm and 1cm of n100] {101}
+    node [fb] (fb101) at (n101.east) {FB = 1};
+    
+% Nó (102) é folha (FB=0)
+\node [goodnode] (n102) [below right=0.8cm and 1cm of n101] {102}
+    node [fb] (fb102) at (n102.east) {FB = 0};
+
+% --- Conectando os nós (desenhando as setas) ---
+\draw [->, thick] (n100.south) -- (n101.north);
+\draw [->, thick] (n101.south) -- (n102.north);
+
+
+\end{tikzpicture}
+\end{center}
+
+
+\end{tcolorbox}
+% --- FIM DO FRAME ---
+
+A AVL detecta isso e aplica imediatamente uma Rotação Simples à Esquerda, forçando "101" a se tornar a nova raiz. 
+
+\begin{tcolorbox}[
+    colback=gray!5,
+    colframe=gray!50,
+    boxrule=0.3pt,
+    arc=2pt,
+    left=6pt, right=6pt, top=5pt, bottom=5pt,
+    title={Resultado: Rotação Simples à Esquerda}
+]
+
+% O seu texto de explicação
+\textit{A AVL detecta isso e aplica imediatamente uma Rotação Simples à Esquerda, forçando "101" a se tornar a nova raiz.}
+
+\vspace{0.8cm}
+\begin{center}
+\begin{tikzpicture}[
+    % Estilo do nó normal (balanceado)
+    goodnode/.style={rectangle, draw, rounded corners=3pt, fill=arraycolor, minimum size=0.8cm, font=\bfseries\small},
+    % Estilo do nó desbalanceado (o gatilho)
+    badnode/.style={rectangle, draw, rounded corners=3pt, fill=linkedcolor, minimum size=0.8cm, font=\bfseries\small},
+    % Estilo para o Fator de Balanceamento (FB)
+    fb/.style={font=\footnotesize\ttfamily\color{black!70}, anchor=west, xshift=3mm}
+]
+
+% --- ESTADO ANTES (Desbalanceado) ---
+\node [above=0.2cm of n100a] (labelA) {\textbf{Antes (FB=2)}};
+\node [badnode] (n100a) at (0, 0) {100}
+    node [fb] (fb100) at (n100a.east) {FB = 2};
+\node [goodnode] (n101a) [below right=0.8cm and 1cm of n100a] {101}
+    node [fb] (fb101) at (n101a.east) {FB = 1};
+\node [goodnode] (n102a) [below right=0.8cm and 1cm of n101a] {102}
+    node [fb] (fb102) at (n102a.east) {FB = 0};
+
+\draw [->, thick] (n100a.south) -- (n101a.north);
+\draw [->, thick] (n101a.south) -- (n102a.north);
+
+
+% --- Seta de Transformação ---
+\node at (4, -1.5) {\huge$\implies$};
+
+
+% --- ESTADO DEPOIS (Balanceado) ---
+\node [goodnode] (n101b) at (8, -1.5) {101}
+    node [fb] (fb101b) at (n101b.east) {FB = 0};
+\node [above=0.2cm of n101b] (labelB) {\textbf{Depois (FB=0)}};
+
+\node [goodnode] (n100b) [below left=0.8cm and 1cm of n101b] {100}
+    node [fb] (fb100b) at (n100b.east) {FB = 0};
+\node [goodnode] (n102b) [below right=0.8cm and 1cm of n101b] {102}
+    node [fb] (fb102b) at (n102b.east) {FB = 0};
+    
+\draw [->, thick] (n101b.south) -- (n100b.north);
+\draw [->, thick] (n101b.south) -- (n102b.north);
+
+\end{tikzpicture}
+\end{center}
+
+\noindent \textbf{Análise da Rotação:} O nó (100), que estava desbalanceado ($FB=2$), "desce" e se torna o filho esquerdo do seu antigo filho direito (101). O nó (101) "sobe" para se tornar a nova raiz. A árvore agora está perfeitamente balanceada ($FB=0$ em todos os nós).
+
+\end{tcolorbox}
+% --- FIM DO FRAME ---
+
+\item \textbf{Resultado:} A altura da árvore (h) é forçada a permanecer o mais próximo possível do ideal matemático. \item \textbf{Garantia:} A altura de uma AVL com N nós matematicamente nunca excederá 1.44×log2​(N). \end{itemize}
+
+\subsubsection{Conclusão da Complexidade} Como a operação de busca depende de h (complexidade $\bigO(h)$), e a \class{ArvoreAVL} garante ativamente que h é mantido em $\bigO(\log N)$, a complexidade de busca em uma \class{ArvoreAVL} é \textbf{sempre $\bigO(\log N)$}.
+
+Isto é verdadeiro independentemente da ordem de inserção dos dados (seja ordenada ou aleatória), pois o custo do balanceamento é pago durante a inserção para garantir que as buscas sejam sempre rápidas.
+
+% ------------------------------------------------------------------------------
+\section{Pesquisa: Árvores na Biblioteca Padrão Java (Etapa 6)}
+
+\subsection{Estruturas Padrão Java (TreeMap e TreeSet)}
+A biblioteca padrão do Java (\code{java.util}) oferece duas implementações principais de árvores binárias de busca balanceadas: \class{TreeMap} e \class{TreeSet}.
+
+Ambas as estruturas são, na implementação padrão do Oracle JDK, baseadas em \textbf{Árvores Rubro-Negras (Red-Black Trees)}. Assim como as Árvores AVL, as Árvores Rubro-Negras são auto-balanceáveis, garantindo desempenho logarítmico para operações essenciais.
+
+\begin{itemize}
+    \item \class{TreeMap<K, V>}: Implementa a interface \code{SortedMap}. Armazena pares de chave-valor (como um dicionário) e os mantém ordenados pela chave (\code{K}).
+    \item \class{TreeSet<E>}: Implementa a interface \code{SortedSet}. Armazena apenas elementos únicos e os mantém ordenados. Internamente, o \class{TreeSet} é apenas um \textit{wrapper} (invólucro) para um \class{TreeMap}.
+\end{itemize}
+
+\subsection{Ordem de Complexidade (Padrão Java)}
+Por serem baseadas em Árvores Rubro-Negras (auto-balanceáveis), a ordem de complexidade das operações principais é garantida como:
+\begin{itemize}
+    \item \textbf{Inserção} (\method{put} ou \method{add}): $\bigO(\log N)$
+    \item \textbf{Busca} (\method{get} ou \method{contains}): $\bigO(\log N)$
+    \item \textbf{Remoção} (\method{remove}): $\bigO(\log N)$
+\end{itemize}
+
+\subsection{Comparativo: Biblioteca Padrão vs. Nossa Biblioteca}
+
+\subsubsection{Métodos Disponíveis}
+A estrutura padrão do Java (ex: \class{TreeMap}) é muito mais robusta, oferecendo dezenas de métodos utilitários. No entanto, ela \textbf{não} oferece um método equivalente ao nosso \method{pesquisar(T valor, Comparator comparador)} para busca por chave secundária.
+
+\subsubsection{Busca por Chave Secundária em TreeMap}
+Sim, é possível fazer uma pesquisa por um dado que não seja a chave de indexação, mas isso \textbf{não é eficiente} e anula o benefício da árvore.
+
+No \class{TreeMap}, a busca é otimizada apenas pela Chave (\code{K}). Se quisermos buscar por um Valor (\code{V}) – por exemplo, buscar um Aluno pelo Nome em um mapa indexado por Matrícula – somos forçados a fazer uma varredura linear ($\bigO(N)$) em todos os elementos da coleção, similar à nossa implementação de busca exaustiva (Q7 da Etapa 3).
+
+Isso é feito iterando sobre o \method{entrySet()} ou \method{values()} e comparando cada valor manualmente.
+
+\subsection{Exemplo de Código: TreeMap (Busca por Chave e por Valor)}
+
+O código abaixo demonstra o uso do \class{TreeMap}, mostrando a busca otimizada por Chave (Matrícula) e a busca linear por Valor (Nome).
+
+\begin{lstlisting}[style=javastyle, caption={Exemplo de uso de TreeMap para busca por Chave e Valor.}]
+import java.util.Comparator;
+import java.util.Map;
+import java.util.TreeMap;
+// Assume que a classe 'Aluno' (definida na Etapa 1) existe.
+
+public class ExemploTreeMap {
+
+    public static void main(String[] args) {
+        
+        // 1. Criando o TreeMap (Indexado pela Chave: Integer - Matrícula)
+        // Não precisamos de um comparador se a Chave (Integer) já implementa Comparable.
+        Map<Integer, Aluno> mapaAlunos = new TreeMap<>();
+
+        mapaAlunos.put(100, new Aluno(100, "Fulano"));
+        mapaAlunos.put(50, new Aluno(50, "Ciclano"));
+        mapaAlunos.put(150, new Aluno(150, "Beltrano"));
+
+        // 2. Busca Otimizada por Chave (Matrícula) - O(log N)
+        System.out.println("--- Busca Otimizada por Chave (ID 100) ---");
+        Aluno aluno100 = mapaAlunos.get(100);
+        if (aluno100 != null) {
+            System.out.println("Encontrado: " + aluno100.getNome());
+        }
+
+        // 3. Busca por Chave Secundária (Valor/Nome) - O(N)
+        System.out.println("\n--- Busca Exaustiva por Valor (Nome 'Ciclano') ---");
+        String nomeBusca = "Ciclano";
+        Aluno alunoEncontrado = null;
+        
+        // Iteramos em TODOS os valores (varredura linear)
+        for (Aluno aluno : mapaAlunos.values()) {
+            if (aluno.getNome().equals(nomeBusca)) {
+                alunoEncontrado = aluno;
+                break; // Encontrou, pode parar
+            }
+        }
+
+        if (alunoEncontrado != null) {
+            System.out.println("Encontrado: Matrícula " + alunoEncontrado.getMatricula());
+        }
+    }
+}
+\end{lstlisting}
+
+\section{Conclusão Geral}
+
+O desenvolvimento da biblioteca \class{ArvoreBinaria} e a análise da \class{ArvoreAVL} e \class{TreeMap} permitiram uma compreensão prática e aprofundada sobre a importância da estrutura de dados e da topologia das árvores binárias de busca (ABB).
+
+A análise comparativa entre árvores degeneradas e perfeitamente balanceadas (Etapa 3) demonstrou de forma clara o impacto direto da ordem de inserção dos elementos no desempenho das operações, além de escarar a diferença que uma boa escolha faz no projeto.
+
+A análise da Etapa 5 (AVL) reforçou este conceito, mostrando que mecanismos de auto-balanceamento (rotações) são essenciais para garantir o desempenho logarítmico ($\bigO(\log N)$) em cenários de pior caso (como dados de entrada ordenados), que é o comportamento padrão de estruturas robustas como o \class{TreeMap} do Java (Etapa 6).
+
+
+\section{Organização dos Códigos Fontes no Repositório}
+
+\noindent O código fonte completo do projeto, incluindo a biblioteca de Árvore Binária de Busca (Etapa 1), o aplicativo \class{DooStore} (Etapa 2) e a futura implementação da \class{ArvoreAVL} (Etapa 4), está disponível no seguinte repositório GitHub:
+
+\vspace{0.5em}
+\url{https://github.com/VdiRemy/ArvoresBinariasTPA.git}
+\vspace{0.5em}
+
+\noindent O projeto segue a estrutura padrão do Maven. Todo o código-fonte está localizado no diretório principal:
+\noindent \texttt{ArvoreBinaria/src/main/java/}
+
+\noindent A organização dos pacotes foi feita da seguinte forma para separar as responsabilidades:
+
+% Usamos 'description' para rótulos customizados.
+% 'itemsep' adiciona espaço entre os itens para clareza.
+\begin{description} 
+    \itemsep 10pt 
+
+    % --- BIBLIOTECA (Etapas 1, 3, 4, 5) ---
+    % Usamos um rótulo curto e lógico para evitar "vazamento" de texto.
+    \item[\textbf{Biblioteca e Testes}]
+    \noindent Pacote: \class{com.mycompany.ArvoreBinaria}
+    
+    \vspace{0.5em}
+    Este pacote contém a \textbf{Biblioteca Central} e os aplicativos de teste dos relatórios.
+    \begin{itemize}
+        \item \class{IArvoreBinaria.java}: A interface principal.
+        \item \class{No.java}: A estrutura do nó da árvore.
+        \item \class{ArvoreBinaria.java}: A implementação da ABB (Etapa 1).
+        \item \class{Aluno.java} e \class{ComparadorAluno...}: O modelo de dados usado pelos relatórios.
+        \item \class{AppRelatorioArvoreBinaria.java}: O aplicativo de teste da Etapa 3.
+        
+        % --- CORREÇÃO DA LÓGICA (ETAPA 4/5) ---
+        % Esta é a instrução que você pediu, mostrando onde os novos arquivos DEVEM ir.
+        \item \textbf{Arquivos (Etapa 4 e 5):}
+        \item \class{ArvoreAVL.java}: A implementação da AVL (Etapa 4).
+        \item \class{AppRelatorioAVL.java}: O aplicativo de teste da Etapa 5, que utiliza a \class{ArvoreAVL}.
+    \end{itemize}
+
+    % --- APP (Etapa 2) ---
+    \item[\textbf{Aplicativo (Etapa 2)}]
+    \noindent Pacote: \class{ScoobyDoo}
+
+    \vspace{0.5em}
+    Este pacote contém o \textbf{Aplicativo de Demonstração (DooStore)}. Ele é desacoplado da lógica interna da biblioteca e apenas a consome como um serviço.
+    \begin{itemize}
+        \item \class{Strain.java}: O modelo de dados personalizado.
+        \item \class{ComparadorStrainPorID.java} e \class{ComparadorStrainPorNome.java}: Os comparadores específicos.
+        \item \class{DooStore.java}: A camada de Serviço (Lógica de Negócios).
+        \item \class{AppDooStore.java}: A camada de Interface (View) com o \method{main()}.
+    \end{itemize}
+    
+    % --- POM ---
+    \item[\textbf{Configuração (Raiz)}]
+    \noindent Arquivo: \code{pom.xml}
+    
+    \vspace{0.5em}
+    O arquivo de configuração do projeto Maven, localizado na raiz (\code{ArvoreBinaria/pom.xml}).
+\end{description}
+
+\end{document}
+
+\documentclass[11pt, a4paper]{article}
+
+% --- Configurações de Layout e Fonte (Obrigatório) ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+%\usepackage{fontspec} % Para compilação em LuaLaTeX
+
+% --- Configuração de Idioma e Suporte a Unicode (Moderno) ---
+% Removemos pacotes conflitantes como inputenc e fontenc.
+\usepackage[brazil]{babel}
+\babelprovide[import, onchar=ids fonts]{english} % Garante suporte a comandos em inglês (como \url)
+
+% Set default/Latin font to Noto Sans (Mandatório)
+
+
+% --- Pacotes e Estilos do Usuário ---
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning}
+\usepackage[table]{xcolor}
+\definecolor{arraycolor}{RGB}{220, 235, 247}
+\definecolor{linkedcolor}{RGB}{255, 220, 220}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% Estilo para código Java
+\lstdefinestyle{javastyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    language=Java
+}
+
+% Estilo inline para código no texto
+\newcommand{\code}[1]{\texttt{\color{blue}#1}}
+\newcommand{\class}[1]{\texttt{\color{teal}#1}}
+\newcommand{\method}[1]{\texttt{\color{purple}#1}}
+\newcommand{\keyword}[1]{\texttt{\color{magenta}#1}}
+\newcommand{\interface}[1]{\texttt{\color{orange}#1}}
+\newcommand{\bigO}{\mathcal{O}}
+
+\lstset{style=javastyle}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CORPO DO DOCUMENTO
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+% --- CAPA ---
+\begin{titlepage}
+    \centering
+    
+    {\large IFES Campus Serra\par}
+    \vspace{1cm}
+    {\large Bacharelado em Sistemas de Informação\par}
+    \vspace{1.5cm}
+    {\Large\bfseries Técnicas de Programação Avançada\par}
+    
+    \vfill
+    
+    {\huge\bfseries Implementação e Análise de Complexidade de Árvores Binárias\par}
+    
+    \vfill
+    
+    \begin{flushright}
+        \Large
+        Remerson Victor S. da Assurreição \\
+    \end{flushright}
+    
+    \vfill
+    
+    {\large Serra, \today\par}
+
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ------------------------------------------------------------------------------
+\section{Análise de Complexidade e Topologia da Árvore Binária de Busca (ABB)}
+
+Esta seção apresenta a análise do desempenho e da topologia da biblioteca \class{ArvoreBinaria} implementada, com base nos testes executados pelo programa \class{AppRelatorioArvoreBinaria}.
+
+\subsection{Árvore Degenerada }
+
+\subsubsection{Q1. Topologia da Árvore Degenerada}
+O método \method{geraArvoreDegenerada} insere elementos na ordem crescente de suas matrículas. Como a \class{ArvoreBinaria} é uma Árvore Binária de Busca (ABB) e o comparador de matrículas (\code{Comparator}) sempre retorna um valor positivo para o novo elemento, cada novo nó é inserido como \textbf{filho à direita} do anterior.
+O resultado é uma topologia chamada \textbf{Árvore Degenerada}, que se comporta como uma Lista Encadeada.
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[
+        level distance=1.5cm,
+        level 1/.style={sibling distance=3cm},
+        level 2/.style={sibling distance=2cm},
+        level 3/.style={sibling distance=1.5cm},
+        every node/.style={draw, circle, inner sep=2pt, font=\small}
+    ]
+    \node (R) at (0,0) {100}
+        child[grow=right] { node {101}
+            child[grow=right] { node {102}
+                child[grow=right] { node {103}
+                    child[grow=right] { node {104} }
+                }
+            }
+        };
+    \draw[dashed, ->, very thick, color=red] (R.south east) -- ++(1.5,-0.5) node[right, color=black, draw=none] {Caminho único: Lista Encadeada};
+    \end{tikzpicture}
+    \caption{Exemplo de Árvore Degenerada gerada por inserção em ordem crescente.}
+    \label{fig:degenerada}
+\end{figure}
+
+\subsubsection{Q2. Nós Percorridos na Busca Degenerada}
+Na Árvore Degenerada, a profundidade de busca no pior caso é igual ao número de elementos. O pior caso ocorre quando o elemento procurado é o último da lista ou não existe. O algoritmo é forçado a percorrer todos os nós até o fim da cadeia.
+\begin{itemize}
+    \item Árvore de 100 elementos (Altura: 99): O pior caso percorre \textbf{100 nós}.
+    \item Árvore de 200 elementos (Altura: 199): O pior caso percorre \textbf{200 nós}.
+    \item Árvore de 1000 elementos (Altura: 999): O pior caso percorre \textbf{1000 nós}.
+\end{itemize}
+A conclusão é baseada no fato de que $h = N-1$ para uma lista, e a busca deve percorrer $h+1$ nós ou $N$ nós.
+
+\subsubsection{Q3. Ordem de Complexidade da Busca Degenerada}
+A complexidade de busca no método \method{pesquisar(T valor)} em uma árvore degenerada é \textbf{Tempo Linear}, ou $\bigO(N)$. Isso ocorre porque o tempo de execução cresce na mesma proporção do número de elementos. A ABB acaba perdendo seu brilho, pois no fim acaba sendo uma busca sequencial em uma lista. Esta complexidade já era esperada justamente por essa topologia semelhante a uma lista, e já analisamos essa complexidade em um trabalho anterior.
+
+\subsection{Árvore Perfeitamente Balanceada}
+
+\subsubsection{Q4. Topologia da Árvore Perfeitamente Balanceada}
+O método \method{geraArvorePerfeitamenteBalanceada} utiliza a técnica de divisão binária do intervalo de matrículas (\code{media = (min+max)/2}) para garantir que o elemento central seja sempre inserido primeiro. Isso minimiza a altura da árvore.
+A topologia resultante é uma \textbf{Árvore Perfeitamente Balanceada}, onde a diferença de altura entre as subárvores esquerda e direita de qualquer nó é a menor possível, resultando em uma estrutura ideal para buscas.
+
+\subsubsection{Q5. Nós Percorridos na Busca Balanceada}
+Em uma árvore perfeitamente balanceada, a profundidade máxima de busca no pior caso é dada por $\lceil \log_2(N+1) \rceil$, onde $N$ é o número de nós.
+\begin{itemize}
+    \item Árvore de 100 elementos (Altura: 6): O pior caso percorre $\log_2(100) \approx 6.64$. O número de nós percorridos é \textbf{7}.
+    \item Árvore de 200 elementos (Altura: 7): O pior caso percorre $\log_2(200) \approx 7.64$. O número de nós percorridos é \textbf{8}.
+    \item Árvore de 1000 elementos (Altura: 9): O pior caso percorre $\log_2(1000) \approx 9.96$. O número de nós percorridos é \textbf{10}.
+\end{itemize}
+
+\subsubsection{Q6. Ordem de Complexidade da Busca Balanceada}
+A complexidade de busca no método \method{pesquisar(T valor)} em uma árvore perfeitamente balanceada é \textbf{Tempo Logarítmico}, ou $\bigO(\log N)$. A cada comparação, o algoritmo elimina aproximadamente metade dos nós restantes, resultando em um desempenho extremamente rápido, mesmo para grandes volumes de dados.
+
+\subsection{Busca por Chave Secundária e Erros Críticos}
+
+\subsubsection{Q7. Complexidade da Busca por Chave Secundária}
+A árvore é indexada pela Matrícula (chave primária), mas a busca utiliza o \code{ComparadorAlunoPorNome} (chave secundária).
+
+\begin{itemize}
+    \item \textbf{Nós Percorridos no Pior Caso:} \textbf{N} (o total de nós na árvore).
+    \item \textbf{Ordem de Complexidade:} $\bigO(N)$ (Tempo Linear).
+\end{itemize}
+\textbf{Explicação:} Como a nova chave de busca (Nome) não segue a ordem estabelecida pela Matrícula (a regra da ABB), o algoritmo \textbf{não pode} descer apenas para a esquerda ou direita. Para garantir que o elemento seja encontrado, o método \method{pesquisar(T valor, Comparator comparador)} implementa uma busca exaustiva (varredura completa) que visita todos os $N$ nós da árvore, de forma semelhante a como ocorre quando temos uma árvore degenerada.
+
+\subsubsection{Q8. Complexidade de Inserção entre Topologias}
+\textbf{Método que Gera a Árvore mais Rapidamente:} \method{geraArvorePerfeitamenteBalanceada}.
+\begin{itemize}
+    \item \textbf{\method{geraArvoreDegenerada} (Complexidade $O(N^2)$):} A inserção do ultimo elemento (elemento de posição i) exige $i$ passos de busca. A complexidade total é a soma de $1 + 2 + \dots + N$, resultando em $\bigO(N^2)$ (Quadrática).
+    \item \textbf{\method{geraArvorePerfeitamenteBalanceada} (Complexidade $O(N \log N)$):} Cada uma das $N$ inserções é feita em uma árvore que se mantém balanceada (altura $O(\log N)$). O custo total para construir a árvore é $N \times O(\log N)$, resultando em $\bigO(N \log N)$.
+\end{itemize}
+Portanto, a árvore balanceada é gerada muito mais rapidamente para grandes valores de $N$.
+
+\subsubsection{Q9. O Erro com 50.000 Elementos}
+\begin{itemize}
+    \item \textbf{Erro Ocorrido:} \code{java.lang.StackOverflowError}.
+    \item \textbf{Momento:} Ao tentar calcular a altura da \textbf{Árvore Degenerada} de $50.000$ elementos, utilizando o método \method{alturaRecursivo()}.
+    \item \textbf{Porquê:} O método de cálculo de altura é \textbf{recursivo}. Em uma árvore degenerada com $50.000$ nós, a recursão exige $50.000$ chamadas aninhadas. O *Stack* (pilha de chamadas) do Java Virtual Machine (JVM) atinge seu limite de memória antes de completar as chamadas, resultando no erro de estouro de pilha. A árvore balanceada não causa esse erro porque sua altura é muito menor ($\approx 15$ níveis). Foi dito em aula que era possível aumentar esse limite de Stacks do sistema, mas não cheguei a realizar o teste. O limite da minha máquina foi de $20.000$ nós.
+\end{itemize}
+
+% ------------------------------------------------------------------------------
+\section{Desenvolvimento do Aplicativo DooStore}
+
+\subsection{Q10. Requisitos Funcionais e Funcionamento do App}
+O aplicativo desenvolvido (\code{AppDooStore}) funciona como um sistema de gerenciamento e consulta de \class{Strains}, as "raças", implementado sob uma arquitetura de Camadas Simples para demonstrar o uso da \class{ArvoreBinaria}.
+
+\subsubsection*{Requisitos Funcionais (RF)}
+\begin{itemize}
+    \item \textbf{RF1 - Cadastro (\method{cadastrarStrain}):} Permite adicionar novos \class{Strain}s (ID, Nome, Características) à árvore, utilizando o método \method{adicionar(T)}.
+    \item \textbf{RF2 - Busca Otimizada (\method{buscarPorID}):} Permite a busca rápida de um \class{Strain} pela chave primária (\code{StrainID}), aproveitando a eficiência $\bigO(\log N)$ da ABB (método \method{pesquisar(T)}).
+    \item \textbf{RF3 - Busca Exaustiva (\method{buscarPorNome}):} Permite a busca pelo \code{Nome} (chave secundária), utilizando o método \method{pesquisar(T, Comparator)} para varrer todos os nós.
+    \item \textbf{RF4 - Listagem Ordenada (\method{listarTodosEmOrdem}):} Gera um relatório de todos os \class{Strain}s, listados em ordem crescente de \code{StrainID}, utilizando o caminhamento \method{caminharEmOrdem()}.
+    \item \textbf{RF5 - Remoção (\method{removerStrainPorID}):} Permite a remoção de um \class{Strain}, demonstrando o algoritmo de correção de ponteiros da ABB (\method{remover(T)}).
+\end{itemize}
+
+\subsubsection*{Funcionamento}
+O \class{AppDooStore} fornece um menu de linha de comando que interage com a camada de serviço (\class{DooStore}). O \class{DooStore} atua como um tradutor das ações do usuário em chamadas diretas aos métodos da \class{ArvoreBinaria}, que mantém todos os dados em memória, indexados pelo \code{StrainID}.
+
+\subsection{Q11. Organização das Classes (Arquitetura)}
+O aplicativo segue o padrão de **Arquitetura de Camadas Simples** (Service/Model/Utility) para separar a lógica de negócio da estrutura de dados.
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[
+        rect/.style={rectangle, draw, rounded corners=5pt, fill=arraycolor, minimum width=3.5cm, minimum height=1cm, align=center, font=\small},
+        service/.style={rectangle, draw, rounded corners=5pt, fill=linkedcolor, minimum width=3.5cm, minimum height=1cm, align=center, font=\small},
+        arrow/.style={->, >=stealth, thick},
+        deparrow/.style={->, >=stealth, dashed, color=gray, thick}, % Estilo para dependências
+        node distance=1.5cm and 1cm % Ajusta distância vertical e horizontal
+    ]
+    % Camada 1: Interface (View/Controller)
+    \node (App) [rect] {\textbf{AppDooStore} \\ (Interface)};
+
+    % Camada 2: Serviço (Business Logic)
+    \node (Service) [service, below=of App] {\textbf{DooStore} \\ (Serviço/Negócio)};
+    
+    % Camada 3: Core/Estrutura (Model/Library)
+    \node (Model) [rect, below=of Service, yshift=-0.5cm] {\textbf{Strain} \\ (Modelo)}; % Yshift para afastar um pouco
+    \node (Library) [rect, right=of Model, xshift=1cm] {\textbf{ArvoreBinaria} \\ (Core)};
+    \node (Comp) [rect, left=of Model, xshift=-1cm] {\textbf{Comparadores}};
+
+    % Fluxo de Controle e Dependências
+    \draw [arrow, dashed] (App) -- node [midway, right, font=\footnotesize] {1. Menu/Input} (Service);
+    \draw [arrow, ultra thick] (Service) -- node [midway, above, sloped, font=\footnotesize, align=center] {2. Chama funções\\da ABB\\ex: \method{adicionar()}} (Library);
+    
+    % Dependências (Setas cinzas tracejadas)
+    \draw [deparrow] (Service) -- node [midway, below left, font=\footnotesize, text=gray] {3. Usa Comparadores} (Comp);
+    \draw [deparrow] (Service) -- node [midway, right, font=\footnotesize, text=gray] {4. Usa Modelo} (Model);
+    \draw [deparrow] (Library) -- (Model); % Dependência implícita da ArvoreBinaria para o Modelo Strain
+    
+    \end{tikzpicture}
+    \caption{Arquitetura de Classes do App DooStore.}
+    \label{fig:arquitetura}
+\end{figure}
+
+\subsection{Q12. Planilha de Contribuições}
+A tabela a seguir detalha a atuação de cada componente do grupo no desenvolvimento da biblioteca e do aplicativo, conforme acordado para a entrega da primeira etapa.
+
+\begin{table}[h!]
+\centering
+\caption{Planilha de Contribuição do Grupo}
+\label{tab:contribuicao}
+\begin{tabular}{@{}c|p{10cm}@{}}
+\toprule
+\textbf{Componente} & \textbf{Tarefas Executadas na Etapa 1, 2 e 3} \\ \midrule
+Remerson Victor S. da Assurreição & \textbf{Implementação da ABB e do Aplicativo:} Desenvolvimento completo dos métodos \code{adicionar}, \code{remover}, \code{pesquisar} (otimizada e exaustiva), \code{altura}, \code{quantidadeNos} e \code{caminharEmOrdem}. Criação das classes \code{Strain}, \code{DooStore}, e \code{AppDooStore} (Menu e Lógica de Negócio). \textbf{Análise e Documentação:} Execução dos testes do App Relatório e redação de todas as respostas (Q1-Q12). \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\vspace{0.5cm}
+
+\noindent O código fonte completo está disponível no repositório do GitHub:
+\url{https://github.com/VdiRemy/ArvoresBinariasTPA.git}
+
+% ------------------------------------------------------------------------------
+\section{Conclusão}
+
+O desenvolvimento da biblioteca \class{ArvoreBinaria} permitiu uma compreensão prática e aprofundada sobre a importância da estrutura de dados e da topologia das árvores binárias de busca (ABB). Acredito que poder aplicar a biblioteca em uma aplicação como do aplicativo \class{AppDooStore} chama bastante atenção, onde temos a possibilidade de por em prática para algo de nosso interesse. Não que seja obrigação da aula fazer isso, já que temos essa liberdade antes mesmo de iniciar o curso, porém acaba sendo um chamariz que ao menos pra mim foi eficaz. Em suma, eu gostei de programar isso!
+
+A análise comparativa entre árvores degeneradas e perfeitamente balanceadas (Seção 1) demonstrou de forma clara o impacto direto da ordem de inserção dos elementos no desempenho das operações. Em trabalhos de menor escopo como os que fizemos até o momento do curso, acaba que essas diferenças não são notáveis, mas para qualquer projeto maior isso faz toda diferença (e nem precisa ser tão grande, já que 50000 é o bastante pra dar problema, e isso é pouco em tempos de globalização).
+
+A implementação da busca por chave secundária (Q7) também reforçou o entendimento de que a eficiência da ABB está diretamente ligada à chave de indexação. Uma busca por um critério diferente exige uma varredura completa ($\bigO(N)$), independentemente da topologia.
+
+Portanto, este trabalho prático não só consolidou os conceitos teóricos de árvores binárias, mas também destacou a importância de considerar os padrões de inserção e busca ao escolher e implementar estruturas de dados para aplicações reais, além do teor didático que se limita somente pela criatividade (e tempo) do universitário. A diferença entre um algoritmo $\bigO(\log N)$ e $\bigO(N)$ (ou pior, $\bigO(N^2)$) pode ser a diferença entre uma aplicação funcional e uma inutilizável em larga escala, esse contato é vital pra entrar no mercado.
+
+\end{document}
