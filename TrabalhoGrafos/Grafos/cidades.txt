@@ -1,0 +1,137 @@
+Vitoria;Serra;12
+Vitoria;Vila Velha;33
+Vitoria;Guarapari;41
+Vitoria;Cariacica;18
+Vitoria;Viana;27
+Vitoria;Fundao;53
+Vitoria;Anchieta;66
+Vitoria;Domingos Martins;44
+Serra;Vitoria;21
+Serra;Vila Velha;39
+Serra;Guarapari;34
+Serra;Cariacica;16
+Serra;Viana;20
+Serra;Fundao;55
+Serra;Anchieta;72
+Serra;Domingos Martins;48
+Vila Velha;Vitoria;11
+Vila Velha;Serra;25
+Vila Velha;Guarapari;47
+Vila Velha;Cariacica;31
+Vila Velha;Viana;19
+Vila Velha;Fundao;60
+Vila Velha;Anchieta;58
+Vila Velha;Domingos Martins;37
+Guarapari;Vitoria;43
+Guarapari;Serra;50
+Guarapari;Vila Velha;22
+Guarapari;Cariacica;38
+Guarapari;Viana;41
+Guarapari;Fundao;74
+Guarapari;Anchieta;29
+Guarapari;Domingos Martins;56
+Cariacica;Vitoria;14
+Cariacica;Serra;26
+Cariacica;Vila Velha;17
+Cariacica;Guarapari;35
+Cariacica;Viana;13
+Cariacica;Fundao;67
+Cariacica;Anchieta;49
+Cariacica;Domingos Martins;52
+Viana;Vitoria;28
+Viana;Serra;22
+Viana;Vila Velha;20
+Viana;Guarapari;46
+Viana;Cariacica;12
+Viana;Fundao;71
+Viana;Anchieta;55
+Viana;Domingos Martins;15
+Fundao;Vitoria;64
+Fundao;Serra;33
+Fundao;Vila Velha;70
+Fundao;Guarapari;76
+Fundao;Cariacica;58
+Fundao;Viana;69
+Fundao;Anchieta;80
+Fundao;Domingos Martins;73
+Anchieta;Vitoria;59
+Anchieta;Serra;62
+Anchieta;Vila Velha;54
+Anchieta;Guarapari;25
+Anchieta;Cariacica;47
+Anchieta;Viana;48
+Anchieta;Fundao;75
+Anchieta;Domingos Martins;61
+Domingos Martins;Vitoria;45
+Domingos Martins;Serra;52
+Domingos Martins;Vila Velha;36
+Domingos Martins;Guarapari;63
+Domingos Martins;Cariacica;40
+Domingos Martins;Viana;14
+Domingos Martins;Fundao;68
+Domingos Martins;Anchieta;57
+
+Vitoria;Serra;19
+Serra;Fundao;82
+Guarapari;Anchieta;31
+Cariacica;Viana;18
+Viana;Domingos Martins;42
+Serra;Vitoria;23
+Vitoria;Guarapari;39
+Fundao;Serra;32
+Anchieta;Guarapari;27
+Vila Velha;Cariacica;21
+Domingos Martins;Viana;16
+Guarapari;Vila Velha;28
+Vila Velha;Anchieta;51
+Cariacica;Serra;24
+Vitoria;Anchieta;62
+Serra;Guarapari;40
+Fundao;Viana;77
+Domingos Martins;Fundao;59
+Anchieta;Vitoria;46
+Vitoria;Viana;35
+Serra;Cariacica;30
+Vila Velha;Domingos Martins;44
+Guarapari;Fundao;80
+Cariacica;Anchieta;43
+Viana;Serra;26
+Fundao;Guarapari;78
+Anchieta;Serra;50
+Domingos Martins;Vila Velha;38
+Vitoria;Domingos Martins;47
+Serra;Viana;29
+Vila Velha;Fundao;73
+Guarapari;Cariacica;33
+Cariacica;Vitoria;11
+Viana;Guarapari;49
+Fundao;Anchieta;85
+Anchieta;Vila Velha;40
+Domingos Martins;Cariacica;34
+Vitoria;Fundao;57
+Serra;Anchieta;63
+Vila Velha;Vitoria;14
+Guarapari;Serra;37
+Cariacica;Guarapari;45
+Viana;Vila Velha;22
+Fundao;Domingos Martins;74
+Anchieta;Viana;41
+Domingos Martins;Serra;51
+Vitoria;Vila Velha;18
+Serra;Domingos Martins;58
+Vila Velha;Serra;26
+Guarapari;Vitoria;42
+Cariacica;Vila Velha;19
+Viana;Cariacica;17
+Fundao;Vitoria;61
+Anchieta;Domingos Martins;53
+Domingos Martins;Anchieta;55
+Vitoria;Serra;24
+Serra;Guarapari;36
+Vila Velha;Guarapari;48
+Guarapari;Anchieta;24
+Cariacica;Fundao;70
+Viana;Vitoria;30
+Fundao;Cariacica;65
+Anchieta;Fundao;79
+Domingos Martins;Guarapari;60
